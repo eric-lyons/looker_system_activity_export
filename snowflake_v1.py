@@ -26,24 +26,18 @@ def create_snowflake_database(datum):
     )
     cs = connector.cursor()
     try:
-        print('creating wh')
         sql = "CREATE WAREHOUSE IF NOT EXISTS system_activity_warehouse"
         cs.execute(sql)
 
-        print('creating db...')
         sql = "CREATE DATABASE IF NOT EXISTS looker_system_activity_clone"
         cs.execute(sql)
 
-        print('setting db...')
         sql = "USE DATABASE looker_system_activity_clone"
         cs.execute(sql)
 
-        print('creating schema...')
         sql = "CREATE SCHEMA IF NOT EXISTS i__looker"
         cs.execute(sql)
-        print('complete!')
 
-        ## Setting use now
         sql = "USE WAREHOUSE system_activity_warehouse"
         cs.execute(sql)
 
@@ -77,7 +71,7 @@ def create_snowflake_database(datum):
             title = title.replace("'", "")
             insert = ("INSERT INTO I__LOOKER_SCHEDULED_PLAN (SCHEDULED_PLAN_ID, SCHEDULED_PLAN_CRON_SCHEDULE, SCHEDULED_PLAN_NAME, USER_EMAIL, SCHEDULED_PLAN_DESTINATION_FORMAT, SCHEDULED_PLAN_DESTINATION_ADDRESSES)"
             "VALUES (" +  str(df['SCHEDULED_PLAN_ID'][row]) + ", '" + str(df['SCHEDULED_PLAN_CRON_SCHEDULE'][row]) + "', '" + title + "', '" +  str(df['USER_EMAIL'][row]) +  "', '" + str(df['SCHEDULED_PLAN_DESTINATION_FORMAT'][row]) +  "', '"  + str(df['SCHEDULED_PLAN_DESTINATION_ADDRESSES'][row]) +  "')")
-            print(insert)
+  
             cs.execute(insert)
         
        
@@ -108,7 +102,7 @@ def get_data_from_system_activity():
             "user.email",
             "scheduled_plan_destination.format",
             "scheduled_plan.destination_addresses"],
-            limit='100',
+            limit='-1',
             filters = {"scheduled_job_stage.completed_date":"yesterday"},
             sorts=["scheduled_plan.id"]
         )
